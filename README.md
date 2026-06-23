@@ -127,6 +127,16 @@ Team rollout sequence:
 
 Do not commit tokens, cookies, tunnel credentials, or Cloudflare API keys.
 
+For local smoke verification from a trusted shell, you can save the token into
+the same encrypted app store without printing it:
+
+```bash
+EVEOS_BEAUTY_API_TOKEN='...' npm run beauty:save-token
+```
+
+Optionally set `EVEOS_BEAUTY_API_BASE_URL` to override the default
+`https://beauty.eveos.one`.
+
 After saving the token, run:
 
 ```bash
