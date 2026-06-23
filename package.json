@@ -63,6 +63,7 @@
     "rebuild:node": "node scripts/rebuild-native-modules.js node",
     "smoke:electron": "npm run rebuild:electron && vite build && electron . --smoke-test",
     "smoke:beauty-api": "node scripts/smoke-beauty-api.mjs",
+    "smoke:beauty-ui": "vite build && node scripts/smoke-beauty-ui.mjs",
     "smoke:beauty-real": "npm run smoke:electron && npm run smoke:beauty-api",
     "beauty:save-token": "node scripts/save-beauty-api-config.mjs",
     "smoke:package-app": "node scripts/smoke-packaged-app.mjs",
