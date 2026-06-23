@@ -186,7 +186,7 @@ Unknown fields should be preserved in a raw metadata panel for debugging.
 
 | Screen | Purpose | Key states |
 |---|---|---|
-| Beauty setup | Configure API base URL, token, health check, Cloudflare Access note. | Empty, validating, valid, invalid, token missing. |
+| Beauty setup | Configure API base URL, token, health check, and Cloudflare Access team enrollment readiness. | Empty, validating, valid, invalid, token missing, admin action needed, team member action needed. |
 | Beauty command desk | Primary question workspace. | Empty, draft, brief loading, brief ready, validation error. |
 | Prompt brief review | Make the "right prompt" explicit before analyst work. | Editable prompt, missing data warnings, evidence-layer checklist. |
 | Analyst run detail | Follow one run from queued to final answer. | Queued, running, succeeded, failed, timed out, canceled if endpoint exists later. |
@@ -340,6 +340,7 @@ This avoids the dirty current workspace at:
 - Analyst run detail and queue monitor.
 - Evidence/citation answer renderer.
 - Decision packet persistence.
+- Cloudflare Access team enrollment readiness panel.
 - Taste-aligned theme tokens and app branding.
 - Branded app icon, tray icon, favicon, and sidebar/welcome logo.
 
@@ -533,6 +534,7 @@ Do not attempt a whole-app feature rewrite in the first PR.
 The fork exists at `/Users/drake/Projects/eveos-cowork` on branch
 `codex/eveos-beauty-client`. The current PR should include the Beauty API
 client, command desk, local decision packets, native-module smoke hardening,
-and EveOS Beauty / BANILA-style identity pass. Remaining follow-up work should
-focus on real-token packaged smoke, export/share UX, Cloudflare Access team
-enrollment UX, and deeper evidence packet browsing.
+EveOS Beauty / BANILA-style identity pass, export/share UX, analyst queue
+mission control, evidence packet browsing, and Cloudflare Access team
+enrollment readiness. Remaining follow-up work should focus on real-token
+packaged smoke and deeper team rollout hardening.
