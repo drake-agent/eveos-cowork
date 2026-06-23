@@ -228,7 +228,7 @@ export const useAppStore = create<AppState>((set) => ({
   sidebarCollapsed: false,
   contextPanelCollapsed: false,
   showSettings: false,
-  showBeautyDesk: false,
+  showBeautyDesk: true,
   settingsTab: null,
   pendingPermission: null,
   pendingSudoPassword: null,

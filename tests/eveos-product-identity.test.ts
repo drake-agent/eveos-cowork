@@ -39,6 +39,15 @@ describe('EveOS Beauty product identity', () => {
     }
   });
 
+  it('uses EveOS Beauty browser metadata and opens the Beauty OS surface by default', () => {
+    const html = read('index.html');
+    const store = read('src/renderer/store/index.ts');
+
+    expect(html).toContain('<title>EveOS Beauty</title>');
+    expect(html).not.toContain('<title>Open Cowork</title>');
+    expect(store).toContain('showBeautyDesk: true');
+  });
+
   it('documents the fork as an EveOS Beauty team client instead of upstream OpenCowork', () => {
     const readme = read('README.md');
 

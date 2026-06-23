@@ -47,6 +47,19 @@ describe('native module scripts', () => {
     expect(fs.existsSync(path.join(root, 'scripts/smoke-packaged-app.mjs'))).toBe(true);
   });
 
+  it('rebuilds Electron native modules before starting the dev Electron app', () => {
+    const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8')) as {
+      scripts: Record<string, string>;
+    };
+
+    expect(pkg.scripts.dev).toBe(
+      'npm run download:node && npm run rebuild:electron && npm run build:wsl-agent && npm run build:lima-agent && npm run build:mcp && vite'
+    );
+    expect(pkg.scripts['dev:with-python']).toBe(
+      'npm run download:node && npm run rebuild:electron && npm run prepare:python && npm run build:wsl-agent && npm run build:lima-agent && npm run build:mcp && vite'
+    );
+  });
+
   it('keeps Electron smoke mode from continuing into normal app startup', () => {
     const mainSource = fs.readFileSync(mainPath, 'utf8');
 
