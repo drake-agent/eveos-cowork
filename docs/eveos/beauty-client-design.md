@@ -32,6 +32,23 @@ Taste dials:
 | Motion intensity | 2 | This is decision infrastructure, not a marketing page. |
 | Visual density | 7 | Users need queue state, citations, evidence warnings, and market context on one screen. |
 
+## Taste Source Traceability
+
+The requested `taste` skill is not exposed as an active Codex skill in this
+session, but the local Claude plugin sources were found and used as design
+references for this fork:
+
+| Source | Local path | Applied interpretation |
+|---|---|---|
+| `design-taste-frontend` | `/Users/drake/.claude/plugins/cache/taste-skill/taste-skill/1.0.0/skills/taste-skill/SKILL.md` | Use a clear design read, avoid generic AI-purple/default SaaS patterns, and set explicit variance/motion/density dials before UI work. |
+| `redesign-existing-projects` | `/Users/drake/.claude/plugins/cache/taste-skill/taste-skill/1.0.0/skills/redesign-skill/SKILL.md` | Audit the existing app first, then make targeted upgrades without rewriting the working Electron/React shell. |
+| `brandkit` | `/Users/drake/.claude/plugins/cache/taste-skill/taste-skill/1.0.0/skills/brandkit/SKILL.md` | Treat the icon and visual system as a coherent brand argument, not decoration or a random logo swap. |
+
+For EveOS Beauty, the taste translation is deliberately narrower than the
+generic `taste-skill` landing-page baseline: this is a data-heavy internal
+cockpit, so density is higher, motion is lower, and brand expression is carried
+through palette, iconography, typography restraint, and evidence-first layout.
+
 ## Observed Facts
 
 | Area | Fact | Evidence |

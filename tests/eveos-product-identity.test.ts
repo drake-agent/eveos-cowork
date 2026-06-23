@@ -62,6 +62,20 @@ describe('EveOS Beauty product identity', () => {
     expect(readme).not.toContain('WeChat Group');
   });
 
+  it('keeps the Beauty OS taste-source traceability in docs', () => {
+    const readme = read('README.md');
+    const spec = read('docs/eveos/beauty-client-design.md');
+
+    expect(readme).toContain('Taste source traceability');
+    expect(spec).toContain('Taste Source Traceability');
+    expect(spec).toContain('design-taste-frontend');
+    expect(spec).toContain('redesign-existing-projects');
+    expect(spec).toContain('brandkit');
+    expect(spec).toContain(
+      '/Users/drake/.claude/plugins/cache/taste-skill/taste-skill/1.0.0/skills/taste-skill/SKILL.md'
+    );
+  });
+
   it('keeps a reproducible BANILA-style icon source and generated app assets', () => {
     expect(fs.existsSync(path.join(root, 'scripts/generate-eveos-beauty-icons.py'))).toBe(true);
     expect(fs.existsSync(path.join(root, 'resources/icon.png'))).toBe(true);

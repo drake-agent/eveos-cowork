@@ -193,6 +193,16 @@ The app should feel like a refined internal operating console:
 - Icons and controls should support work: health, queue, evidence, save, export,
   and access state.
 
+Taste source traceability:
+
+- The fork spec uses the local taste/design references listed in
+  `docs/eveos/beauty-client-design.md`, not a generic dashboard aesthetic.
+- The applied rule is restrained: OpenCowork remains the implementation base,
+  while EveOS Beauty gets a BANILA/F&CO operating-console palette, denser
+  evidence surfaces, and targeted redesign checks.
+- The screenshot gate is `npm run smoke:beauty-ui`, which verifies the Beauty OS
+  first screen at desktop and narrow/mobile widths.
+
 ## Current Limits
 
 - Authenticated live Beauty API smoke still needs a local secure-token pass.
