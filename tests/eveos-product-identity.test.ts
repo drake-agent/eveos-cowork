@@ -39,6 +39,20 @@ describe('EveOS Beauty product identity', () => {
     }
   });
 
+  it('documents the fork as an EveOS Beauty team client instead of upstream OpenCowork', () => {
+    const readme = read('README.md');
+
+    expect(readme).toContain('# EveOS Beauty');
+    expect(readme).toContain('https://beauty.eveos.one');
+    expect(readme).toContain('Cloudflare Access');
+    expect(readme).toContain('Anna analyst queue');
+    expect(readme).toContain('Decision packets');
+    expect(readme).toContain('OpenCoworkAI/open-cowork');
+    expect(readme).not.toContain('Open Cowork: Your Personal AI Agent Desktop App');
+    expect(readme).not.toContain('brew tap OpenCoworkAI/tap');
+    expect(readme).not.toContain('WeChat Group');
+  });
+
   it('keeps a reproducible BANILA-style icon source and generated app assets', () => {
     expect(fs.existsSync(path.join(root, 'scripts/generate-eveos-beauty-icons.py'))).toBe(true);
     expect(fs.existsSync(path.join(root, 'resources/icon.png'))).toBe(true);
