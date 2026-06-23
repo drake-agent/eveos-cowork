@@ -40,6 +40,9 @@ import type {
   RemoteSessionMapping,
   BeautyAnalystRunRequest,
   BeautyConfigInput,
+  BeautyDecisionPacket,
+  BeautyDecisionPacketInput,
+  BeautyPacketListFilters,
   BeautyPublicConfig,
   BeautyQuestionRequest,
 } from '../shared/ipc-types';
@@ -229,6 +232,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke('beauty.answerResult', runId),
     analystQueue: (limit?: number): Promise<unknown> =>
       ipcRenderer.invoke('beauty.analystQueue', limit),
+    savePacket: (input: BeautyDecisionPacketInput): Promise<BeautyDecisionPacket> =>
+      ipcRenderer.invoke('beauty.savePacket', input),
+    listPackets: (filters?: BeautyPacketListFilters): Promise<BeautyDecisionPacket[]> =>
+      ipcRenderer.invoke('beauty.listPackets', filters),
+    getPacket: (id: string): Promise<BeautyDecisionPacket | null> =>
+      ipcRenderer.invoke('beauty.getPacket', id),
+    deletePacket: (id: string): Promise<{ success: boolean }> =>
+      ipcRenderer.invoke('beauty.deletePacket', id),
   },
 
   // Skills methods
@@ -530,6 +541,10 @@ declare global {
         analystRun: (payload: BeautyAnalystRunRequest) => Promise<unknown>;
         answerResult: (runId: string) => Promise<unknown>;
         analystQueue: (limit?: number) => Promise<unknown>;
+        savePacket: (input: BeautyDecisionPacketInput) => Promise<BeautyDecisionPacket>;
+        listPackets: (filters?: BeautyPacketListFilters) => Promise<BeautyDecisionPacket[]>;
+        getPacket: (id: string) => Promise<BeautyDecisionPacket | null>;
+        deletePacket: (id: string) => Promise<{ success: boolean }>;
       };
       skills: {
         getAll: () => Promise<Skill[]>;

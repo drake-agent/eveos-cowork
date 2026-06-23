@@ -6,6 +6,11 @@ import {
   type BeautyQuestionRequest,
 } from './beauty-api-client';
 import type { BeautyConfigInput, BeautyConfigStoreLike } from './beauty-config-store';
+import type {
+  BeautyDecisionPacketInput,
+  BeautyPacketListFilters,
+  BeautyPacketStoreLike,
+} from './beauty-packet-store';
 
 interface IpcMainLike {
   handle(channel: string, listener: (event: unknown, ...args: unknown[]) => unknown): void;
@@ -22,6 +27,7 @@ interface BeautyApiClientLike {
 
 interface RegisterBeautyIpcOptions {
   configStore: BeautyConfigStoreLike;
+  packetStore?: BeautyPacketStoreLike;
   createClient?: () => BeautyApiClientLike;
   logError?: (...args: unknown[]) => void;
 }
@@ -80,6 +86,24 @@ export function registerBeautyIpcHandlers(
       options.logError
     )
   );
+
+  if (options.packetStore) {
+    ipcMain.handle('beauty.savePacket', (_event, input: unknown) =>
+      options.packetStore?.save(input as BeautyDecisionPacketInput)
+    );
+
+    ipcMain.handle('beauty.listPackets', (_event, filters: unknown) =>
+      options.packetStore?.list(filters as BeautyPacketListFilters)
+    );
+
+    ipcMain.handle('beauty.getPacket', (_event, id: unknown) =>
+      options.packetStore?.get(String(id))
+    );
+
+    ipcMain.handle('beauty.deletePacket', (_event, id: unknown) => ({
+      success: Boolean(options.packetStore?.delete(String(id))),
+    }));
+  }
 }
 
 async function invokeBeautyHandler(

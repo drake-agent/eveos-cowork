@@ -32,10 +32,14 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('window.electronAPI.beauty.intentBrief');
     expect(desk).toContain('window.electronAPI.beauty.analystRun');
     expect(desk).toContain('window.electronAPI.beauty.answerResult');
+    expect(desk).toContain('window.electronAPI.beauty.savePacket');
+    expect(desk).toContain('window.electronAPI.beauty.listPackets');
     expect(desk).toContain('Observed facts');
     expect(desk).toContain('Inference');
     expect(desk).toContain('Citations');
     expect(desk).toContain('Missing data warnings');
     expect(desk).toContain('Confidence');
+    expect(desk).toContain('Save packet');
+    expect(desk).toContain('Saved reports/history');
   });
 });

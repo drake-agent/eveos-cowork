@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import type { BeautyDecisionPacket } from '../../../shared/ipc-types';
 
 type BeautyStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -36,6 +37,8 @@ export function BeautyCommandDesk() {
   const [run, setRun] = useState<RunState | null>(null);
   const [answer, setAnswer] = useState<unknown>(null);
   const [queue, setQueue] = useState<unknown>(null);
+  const [packets, setPackets] = useState<BeautyDecisionPacket[]>([]);
+  const [selectedPacketId, setSelectedPacketId] = useState('');
   const [error, setError] = useState('');
 
   const beautyApi = window.electronAPI?.beauty;
@@ -60,11 +63,27 @@ export function BeautyCommandDesk() {
     setHasToken(config.hasToken);
   }, [beautyApi]);
 
+  const loadPackets = useCallback(async () => {
+    if (!beautyApi) return;
+    const history = await window.electronAPI.beauty.listPackets({
+      market: form.market,
+      brand: form.brand,
+      limit: 20,
+    });
+    setPackets(history);
+  }, [beautyApi, form.brand, form.market]);
+
   useEffect(() => {
     loadConfig().catch((err) => {
       setError(formatError(err));
     });
   }, [loadConfig]);
+
+  useEffect(() => {
+    loadPackets().catch((err) => {
+      setError(formatError(err));
+    });
+  }, [loadPackets]);
 
   const saveConfig = useCallback(async () => {
     if (!beautyApi) return;
@@ -141,6 +160,54 @@ export function BeautyCommandDesk() {
       setError(formatError(err));
     }
   }, [beautyApi, run]);
+
+  const savePacket = useCallback(async () => {
+    if (!beautyApi || !answer) return;
+    setError('');
+    try {
+      const saved = await window.electronAPI.beauty.savePacket({
+        question: requestPayload.question,
+        market: requestPayload.market,
+        brand: requestPayload.brand,
+        product: requestPayload.product,
+        decision_type: requestPayload.decision_type,
+        run_id: run?.runId,
+        brief,
+        answer,
+      });
+      setSelectedPacketId(saved.id);
+      await loadPackets();
+    } catch (err) {
+      setError(formatError(err));
+    }
+  }, [answer, beautyApi, brief, loadPackets, requestPayload, run?.runId]);
+
+  const loadPacketIntoDesk = useCallback(
+    async (packetId: string) => {
+      if (!beautyApi) return;
+      setError('');
+      try {
+        const packet = await window.electronAPI.beauty.getPacket(packetId);
+        if (!packet) return;
+        setSelectedPacketId(packet.id);
+        setForm({
+          market: packet.market || 'KR',
+          brand: packet.brand || '',
+          product: packet.product || '',
+          decisionType: packet.decision_type || '',
+          question: packet.question,
+        });
+        setBrief(packet.brief || null);
+        setAnswer(packet.answer);
+        setRun(packet.run_id ? { runId: packet.run_id, status: 'SAVED' } : null);
+        setBriefStatus(packet.brief ? 'ready' : 'idle');
+        setRunStatus('ready');
+      } catch (err) {
+        setError(formatError(err));
+      }
+    },
+    [beautyApi]
+  );
 
   return (
     <div className="h-full min-h-0 overflow-y-auto bg-background">
@@ -307,11 +374,45 @@ export function BeautyCommandDesk() {
                   >
                     Refresh result
                   </button>
+                  <button className="btn btn-primary" onClick={savePacket} disabled={!answer}>
+                    Save packet
+                  </button>
                 </div>
               </Panel>
             </div>
 
             <aside className="space-y-4">
+              <Panel title="Saved reports/history">
+                {packets.length === 0 ? (
+                  <p className="text-sm leading-6 text-text-muted">
+                    No saved packets for this market and brand yet.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {packets.map((packet) => (
+                      <button
+                        key={packet.id}
+                        onClick={() => loadPacketIntoDesk(packet.id)}
+                        className={`w-full rounded-xl border px-3 py-2 text-left transition-colors ${
+                          selectedPacketId === packet.id
+                            ? 'border-accent/40 bg-accent-muted/50'
+                            : 'border-border-muted bg-background/55 hover:bg-surface-hover'
+                        }`}
+                      >
+                        <div className="line-clamp-2 text-[13px] font-medium leading-5 text-text-primary">
+                          {packet.question}
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-1 text-[11px] text-text-muted">
+                          <span>{packet.market || 'global'}</span>
+                          {packet.brand ? <span>{packet.brand}</span> : null}
+                          {packet.product ? <span>{packet.product}</span> : null}
+                          <span>{formatDate(packet.updatedAt)}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </Panel>
               <Panel title="Queue monitor">
                 <JsonBlock value={queue || { state: 'No queue snapshot loaded yet.' }} compact />
               </Panel>
@@ -463,6 +564,19 @@ function getStringField(value: unknown, key: string): string {
 
 function formatError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 const emptyBriefCopy = {

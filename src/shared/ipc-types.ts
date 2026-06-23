@@ -87,6 +87,31 @@ export interface BeautyAnalystRunRequest extends BeautyQuestionRequest {
   wait?: boolean;
 }
 
+export interface BeautyDecisionPacketInput {
+  id?: string;
+  question: string;
+  market?: string;
+  brand?: string;
+  product?: string;
+  decision_type?: string;
+  run_id?: string;
+  brief?: unknown;
+  answer: unknown;
+}
+
+export interface BeautyDecisionPacket extends BeautyDecisionPacketInput {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BeautyPacketListFilters {
+  market?: string;
+  brand?: string;
+  product?: string;
+  limit?: number;
+}
+
 // ---------------------------------------------------------------------------
 // Remote
 // ---------------------------------------------------------------------------
