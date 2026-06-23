@@ -1,10 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  blocklist: ['[-:_.]', '[cwd:path]', '[cwd:路径]'],
   theme: {
     extend: {
       colors: {
@@ -46,13 +44,13 @@ module.exports = {
         mono: ['JetBrains Mono', 'SF Mono', 'Menlo', 'monospace'],
       },
       boxShadow: {
-        'soft': 'var(--shadow-soft)',
-        'card': 'var(--shadow-card)',
-        'elevated': 'var(--shadow-elevated)',
+        soft: 'var(--shadow-soft)',
+        card: 'var(--shadow-card)',
+        elevated: 'var(--shadow-elevated)',
       },
       borderRadius: {
-        'lg': '8px',
-        'xl': '10px',
+        lg: '8px',
+        xl: '10px',
         '2xl': '14px',
         '3xl': '16px',
       },
@@ -63,7 +61,7 @@ module.exports = {
         'fade-in': 'fadeIn 0.2s ease-out',
         'slide-up': 'slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
         'spin-slow': 'spin 2s linear infinite',
-        'expand': 'expand 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        expand: 'expand 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -82,4 +80,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};

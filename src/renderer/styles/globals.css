@@ -315,7 +315,7 @@
   .prose-chat blockquote {
     margin: 0.75rem 0;
     padding-left: 1rem;
-    border-left: 3px solid theme('colors.accent.DEFAULT / 40%');
+    border-left: 3px solid var(--color-accent);
     color: theme('colors.text.secondary');
   }
 

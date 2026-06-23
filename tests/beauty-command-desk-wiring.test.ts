@@ -45,6 +45,9 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('Team access');
     expect(desk).toContain('Cloudflare Access');
     expect(desk).toContain('Bearer token stays in Electron main');
+    expect(desk).toContain('Sparkles');
+    expect(desk).toContain('ShieldCheck');
+    expect(desk).toContain('RefreshCw');
   });
 
   it('uses mobile-safe Beauty layout classes and visible disabled button styling', () => {

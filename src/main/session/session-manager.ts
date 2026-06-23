@@ -128,7 +128,7 @@ export class SessionManager {
    */
   private createAgentRunner(): void {
     this.agentRunner = this.createClaudeAgentRunner();
-    log('[SessionManager] Using Open Cowork agent runner');
+    log('[SessionManager] Using EveOS Beauty agent runner');
   }
 
   private createClaudeAgentRunner(): ClaudeAgentRunner {

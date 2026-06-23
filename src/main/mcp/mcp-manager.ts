@@ -331,7 +331,7 @@ export class MCPManager {
       );
       if (!preferredNpxPath) {
         throw new Error(
-          'npx is not available. Install Node.js so Open Cowork can use your system npx.cmd, or reinstall the app to restore the bundled runtime.'
+          'npx is not available. Install Node.js so EveOS Beauty can use your system npx.cmd, or reinstall the app to restore the bundled runtime.'
         );
       }
 
