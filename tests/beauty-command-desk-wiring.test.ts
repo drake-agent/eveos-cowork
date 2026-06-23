@@ -7,6 +7,7 @@ const appPath = path.join(root, 'src/renderer/App.tsx');
 const sidebarPath = path.join(root, 'src/renderer/components/Sidebar.tsx');
 const storePath = path.join(root, 'src/renderer/store/index.ts');
 const deskPath = path.join(root, 'src/renderer/components/beauty/BeautyCommandDesk.tsx');
+const globalsPath = path.join(root, 'src/renderer/styles/globals.css');
 
 describe('Beauty Command Desk wiring', () => {
   it('adds a dedicated Beauty OS surface reachable from the shell', () => {
@@ -41,5 +42,18 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('Confidence');
     expect(desk).toContain('Save packet');
     expect(desk).toContain('Saved reports/history');
+    expect(desk).toContain('Team access');
+    expect(desk).toContain('Cloudflare Access');
+    expect(desk).toContain('Bearer token stays in Electron main');
+  });
+
+  it('uses mobile-safe Beauty layout classes and visible disabled button styling', () => {
+    const desk = readFileSync(deskPath, 'utf8');
+    const globals = readFileSync(globalsPath, 'utf8');
+
+    expect(desk).toContain('grid grid-cols-1 gap-2 sm:grid-cols-2');
+    expect(desk).toContain('flex flex-col gap-2 border-t border-border-muted pt-3 sm:flex-row');
+    expect(globals).toContain('disabled:cursor-not-allowed');
+    expect(globals).toContain('disabled:opacity-40');
   });
 });

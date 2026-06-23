@@ -211,7 +211,7 @@ export function BeautyCommandDesk() {
 
   return (
     <div className="h-full min-h-0 overflow-y-auto bg-background">
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-6 py-6">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-4 py-6 sm:px-6">
         <header className="flex flex-col gap-3 border-b border-border-muted pb-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="text-[12px] font-semibold tracking-[0.08em] text-accent">
@@ -261,7 +261,7 @@ export function BeautyCommandDesk() {
                   className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-accent"
                 />
               </label>
-              <div className="mt-3 flex gap-2">
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   className="btn btn-primary flex-1"
                   onClick={saveConfig}
@@ -279,8 +279,19 @@ export function BeautyCommandDesk() {
               </div>
             </Panel>
 
+            <Panel title="Team access">
+              <div className="space-y-2 text-sm leading-6 text-text-secondary">
+                <p>Use Cloudflare Access for email allowlists before broad rollout.</p>
+                <p>Bearer token stays in Electron main; renderer sees only hasToken.</p>
+                <p>
+                  OpenClaw stays behind Anna analyst queue. No direct Anna files, DB, SSH, or
+                  Tailscale.
+                </p>
+              </div>
+            </Panel>
+
             <Panel title="Question setup">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Field
                   label="Market"
                   value={form.market}
@@ -311,7 +322,7 @@ export function BeautyCommandDesk() {
                   className="mt-2 w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm leading-6 text-text-primary outline-none focus:border-accent"
                 />
               </label>
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   className="btn btn-secondary"
                   onClick={buildBrief}
@@ -363,7 +374,7 @@ export function BeautyCommandDesk() {
                     value={pickAnswerField(answer, ['next_recommended_action', 'next_action'])}
                   />
                 </div>
-                <div className="mt-4 flex items-center justify-between border-t border-border-muted pt-3">
+                <div className="mt-4 flex flex-col gap-2 border-t border-border-muted pt-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-xs text-text-muted">
                     {run?.runId ? `Run ID ${run.runId}` : 'No analyst run queued yet.'}
                   </div>
