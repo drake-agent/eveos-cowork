@@ -56,6 +56,12 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('QueueSnapshotPanel');
     expect(desk).toContain('summarizeBeautyQueueSnapshot');
     expect(desk).toContain('Team access');
+    expect(desk).toContain('Team enrollment readiness');
+    expect(desk).toContain('TeamAccessChecklistPanel');
+    expect(desk).toContain('buildBeautyTeamAccessChecklist');
+    expect(desk).toContain('Open Cloudflare Access');
+    expect(desk).toContain('Admin');
+    expect(desk).toContain('Team member');
     expect(desk).toContain('Cloudflare Access');
     expect(desk).toContain('Bearer token stays in Electron main');
     expect(desk).toContain('Sparkles');

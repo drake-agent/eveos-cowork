@@ -26,6 +26,11 @@ import {
   type BeautyQueueStatus,
 } from './beauty-queue-summary';
 import { summarizeBeautyEvidence, type BeautyEvidenceSummary } from './beauty-evidence-summary';
+import {
+  buildBeautyTeamAccessChecklist,
+  type BeautyTeamAccessChecklist,
+  type BeautyTeamAccessStatus,
+} from './beauty-team-access-checklist';
 
 type BeautyStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -74,6 +79,15 @@ export function BeautyCommandDesk() {
   const canBuildBrief = form.question.trim().length > 0 && canUseBeautyApi;
   const queueSummary = useMemo(() => summarizeBeautyQueueSnapshot(queue), [queue]);
   const evidenceSummary = useMemo(() => summarizeBeautyEvidence(answer), [answer]);
+  const teamAccessChecklist = useMemo(
+    () =>
+      buildBeautyTeamAccessChecklist({
+        baseUrl: apiBaseUrl,
+        hasToken,
+        healthStatus,
+      }),
+    [apiBaseUrl, hasToken, healthStatus]
+  );
 
   const requestPayload = useMemo(
     () => ({
@@ -358,14 +372,15 @@ export function BeautyCommandDesk() {
             </Panel>
 
             <Panel title="Team access" icon={<ShieldCheck className="h-4 w-4" />}>
-              <div className="space-y-2 text-sm leading-6 text-text-secondary">
-                <p>Use Cloudflare Access for email allowlists before broad rollout.</p>
-                <p>Bearer token stays in Electron main; renderer sees only hasToken.</p>
-                <p>
-                  OpenClaw stays behind Anna analyst queue. No direct Anna files, DB, SSH, or
-                  Tailscale.
-                </p>
-              </div>
+              <TeamAccessChecklistPanel checklist={teamAccessChecklist} />
+              <button
+                className="btn btn-secondary mt-3 w-full"
+                onClick={() => window.electronAPI.openExternal('https://one.dash.cloudflare.com/')}
+                title="Open Cloudflare Access"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Cloudflare Access
+              </button>
             </Panel>
 
             <Panel title="Question setup" icon={<Search className="h-4 w-4" />}>
@@ -664,6 +679,77 @@ function AnswerSection({ title, value }: { title: string; value: unknown }) {
         <FormattedValue value={value || 'Not available yet.'} />
       </div>
     </section>
+  );
+}
+
+function TeamAccessChecklistPanel({ checklist }: { checklist: BeautyTeamAccessChecklist }) {
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl border border-border-muted bg-background/55 px-3 py-2">
+        <div className="text-[12px] font-semibold text-text-primary">Team enrollment readiness</div>
+        <div className="mt-2 grid grid-cols-2 gap-2 text-[11px] text-text-secondary">
+          <span className="rounded-lg bg-surface px-2 py-1">
+            Ready <b className="text-text-primary">{checklist.counts.ready}</b>
+          </span>
+          <span className="rounded-lg bg-surface px-2 py-1">
+            Verify <b className="text-text-primary">{checklist.counts.verify}</b>
+          </span>
+          <span className="rounded-lg bg-surface px-2 py-1">
+            Admin <b className="text-text-primary">{checklist.counts.needsAdmin}</b>
+          </span>
+          <span className="rounded-lg bg-surface px-2 py-1">
+            Team member <b className="text-text-primary">{checklist.counts.needsUser}</b>
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {checklist.items.map((item) => (
+          <div key={item.id} className="rounded-xl border border-border-muted bg-background/55 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="text-[13px] font-medium text-text-primary">{item.label}</div>
+              <div className="flex items-center gap-1.5">
+                <TeamAccessStatusBadge status={item.status} />
+                <span className="rounded-full border border-border-muted bg-surface px-2 py-0.5 text-[10px] font-medium text-text-secondary">
+                  {item.owner}
+                </span>
+              </div>
+            </div>
+            <p className="mt-1 text-xs leading-5 text-text-secondary">{item.detail}</p>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-xs leading-5 text-text-muted">
+        Cloudflare Access controls team email enrollment. Bearer token stays in Electron main;
+        renderer sees only hasToken.
+      </p>
+    </div>
+  );
+}
+
+function TeamAccessStatusBadge({ status }: { status: BeautyTeamAccessStatus }) {
+  const label =
+    status === 'ready'
+      ? 'Ready'
+      : status === 'verify'
+        ? 'Verify'
+        : status === 'needs_admin'
+          ? 'Admin'
+          : 'Team member';
+  const className =
+    status === 'ready'
+      ? 'border-success/30 bg-success/10 text-success'
+      : status === 'verify'
+        ? 'border-warning/30 bg-warning/10 text-warning'
+        : status === 'needs_admin'
+          ? 'border-accent/30 bg-accent-muted text-accent'
+          : 'border-border-muted bg-surface text-text-secondary';
+
+  return (
+    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${className}`}>
+      {label}
+    </span>
   );
 }
 
