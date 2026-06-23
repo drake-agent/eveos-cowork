@@ -38,6 +38,10 @@ import type {
   PairedUser,
   PairingRequest,
   RemoteSessionMapping,
+  BeautyAnalystRunRequest,
+  BeautyConfigInput,
+  BeautyPublicConfig,
+  BeautyQuestionRequest,
 } from '../shared/ipc-types';
 
 // Track registered callbacks to prevent duplicate listeners
@@ -207,6 +211,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getTools: (): Promise<McpTool[]> => ipcRenderer.invoke('mcp.getTools'),
     getServerStatus: (): Promise<McpServerStatus[]> => ipcRenderer.invoke('mcp.getServerStatus'),
     getPresets: (): Promise<McpPresetsMap> => ipcRenderer.invoke('mcp.getPresets'),
+  },
+
+  beauty: {
+    getConfig: (): Promise<BeautyPublicConfig> => ipcRenderer.invoke('beauty.getConfig'),
+    saveConfig: (
+      input: BeautyConfigInput
+    ): Promise<{ success: boolean; config: BeautyPublicConfig }> =>
+      ipcRenderer.invoke('beauty.saveConfig', input),
+    health: (): Promise<unknown> => ipcRenderer.invoke('beauty.health'),
+    tools: (): Promise<unknown> => ipcRenderer.invoke('beauty.tools'),
+    intentBrief: (payload: BeautyQuestionRequest): Promise<unknown> =>
+      ipcRenderer.invoke('beauty.intentBrief', payload),
+    analystRun: (payload: BeautyAnalystRunRequest): Promise<unknown> =>
+      ipcRenderer.invoke('beauty.analystRun', payload),
+    answerResult: (runId: string): Promise<unknown> =>
+      ipcRenderer.invoke('beauty.answerResult', runId),
+    analystQueue: (limit?: number): Promise<unknown> =>
+      ipcRenderer.invoke('beauty.analystQueue', limit),
   },
 
   // Skills methods
@@ -411,7 +433,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   memory: {
-    getOverview: (cwd?: string): Promise<MemoryOverview> => ipcRenderer.invoke('memory.getOverview', cwd),
+    getOverview: (cwd?: string): Promise<MemoryOverview> =>
+      ipcRenderer.invoke('memory.getOverview', cwd),
     search: (payload: {
       query: string;
       cwd?: string;
@@ -424,7 +447,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke('memory.rebuildWorkspace', cwd),
     clearWorkspace: (cwd: string): Promise<{ success: boolean; workspaceKey: string }> =>
       ipcRenderer.invoke('memory.clearWorkspace', cwd),
-    clearCoreMemory: (): Promise<{ success: boolean }> => ipcRenderer.invoke('memory.clearCoreMemory'),
+    clearCoreMemory: (): Promise<{ success: boolean }> =>
+      ipcRenderer.invoke('memory.clearCoreMemory'),
     rebuildAll: (): Promise<{ success: boolean; workspaceCount: number; sessionCount: number }> =>
       ipcRenderer.invoke('memory.rebuildAll'),
     listFiles: (): Promise<MemoryDebugFileInfo[]> => ipcRenderer.invoke('memory.listFiles'),
@@ -494,6 +518,18 @@ declare global {
         getTools: () => Promise<McpTool[]>;
         getServerStatus: () => Promise<McpServerStatus[]>;
         getPresets: () => Promise<McpPresetsMap>;
+      };
+      beauty: {
+        getConfig: () => Promise<BeautyPublicConfig>;
+        saveConfig: (
+          input: BeautyConfigInput
+        ) => Promise<{ success: boolean; config: BeautyPublicConfig }>;
+        health: () => Promise<unknown>;
+        tools: () => Promise<unknown>;
+        intentBrief: (payload: BeautyQuestionRequest) => Promise<unknown>;
+        analystRun: (payload: BeautyAnalystRunRequest) => Promise<unknown>;
+        answerResult: (runId: string) => Promise<unknown>;
+        analystQueue: (limit?: number) => Promise<unknown>;
       };
       skills: {
         getAll: () => Promise<Skill[]>;
@@ -665,7 +701,11 @@ declare global {
         rebuildWorkspace: (cwd: string) => Promise<{ success: boolean; workspaceKey: string }>;
         clearWorkspace: (cwd: string) => Promise<{ success: boolean; workspaceKey: string }>;
         clearCoreMemory: () => Promise<{ success: boolean }>;
-        rebuildAll: () => Promise<{ success: boolean; workspaceCount: number; sessionCount: number }>;
+        rebuildAll: () => Promise<{
+          success: boolean;
+          workspaceCount: number;
+          sessionCount: number;
+        }>;
         listFiles: () => Promise<MemoryDebugFileInfo[]>;
         readFile: (filePath: string) => Promise<MemoryDebugFileContent>;
         inspectSession: (

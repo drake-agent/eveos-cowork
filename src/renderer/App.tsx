@@ -38,6 +38,11 @@ const ConfigModal = lazy(() =>
 const SettingsPanel = lazy(() =>
   import('./components/SettingsPanel').then((module) => ({ default: module.SettingsPanel }))
 );
+const BeautyCommandDesk = lazy(() =>
+  import('./components/beauty/BeautyCommandDesk').then((module) => ({
+    default: module.BeautyCommandDesk,
+  }))
+);
 
 function MainPanelFallback() {
   return (
@@ -65,6 +70,7 @@ function App() {
   const { sidebarCollapsed } = useLayoutState();
   const { showConfigModal, isConfigured, appConfig } = useConfigModalState();
   const globalNotice = useGlobalNotice();
+  const showBeautyDesk = useAppStore((s) => s.showBeautyDesk);
   const { progress: sandboxSetupProgress, isComplete: isSandboxSetupComplete } =
     useSandboxSetupState();
   const sandboxSyncStatus = useSandboxSyncStatus();
@@ -190,6 +196,16 @@ function App() {
                 <SettingsPanel onClose={() => setShowSettings(false)} />
               </Suspense>
             </PanelErrorBoundary>
+          ) : showBeautyDesk ? (
+            <PanelErrorBoundary
+              name="BeautyCommandDesk"
+              resetKey="beauty-command-desk"
+              fallback={<MainPanelFallback />}
+            >
+              <Suspense fallback={<MainPanelFallback />}>
+                <BeautyCommandDesk />
+              </Suspense>
+            </PanelErrorBoundary>
           ) : activeSessionId ? (
             <PanelErrorBoundary
               name="ChatView"
@@ -206,7 +222,7 @@ function App() {
         </main>
 
         {/* Context Panel - only show when in session and not in settings */}
-        {activeSessionId && !showSettings && (
+        {activeSessionId && !showSettings && !showBeautyDesk && (
           <PanelErrorBoundary
             name="ContextPanel"
             resetKey={activeSessionId}

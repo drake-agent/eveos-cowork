@@ -87,6 +87,8 @@ import {
 } from './utils/logger';
 import { listRecentWorkspaceFiles } from './utils/recent-workspace-files';
 import { buildDiagnosticsSummary } from './utils/diagnostics-summary';
+import { registerBeautyIpcHandlers } from './beauty/beauty-ipc';
+import { beautyConfigStore } from './beauty/beauty-config-store';
 
 // Current working directory (persisted between sessions)
 let currentWorkingDir: string | null = null;
@@ -1387,6 +1389,11 @@ ipcMain.handle('dialog.selectFiles', async () => {
   }
 
   return result.filePaths;
+});
+
+registerBeautyIpcHandlers(ipcMain, {
+  configStore: beautyConfigStore,
+  logError,
 });
 
 // Config IPC handlers
