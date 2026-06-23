@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import Store from 'electron-store';
+import fs from 'node:fs';
 import { redactBeautySmokeText } from './smoke-beauty-api.mjs';
 
 const DEFAULT_BASE_URL = 'https://beauty.eveos.one';
@@ -17,12 +18,18 @@ const STORE_OPTIONS = {
 
 export function resolveBeautyApiConfigInput({
   env = process.env,
+  argv = process.argv.slice(2),
+  readStdin = () => fs.readFileSync(0, 'utf8'),
   now = () => new Date(),
 } = {}) {
-  const token = env.EVEOS_BEAUTY_API_TOKEN?.trim() || '';
+  const shouldReadTokenFromStdin = argv.includes('--token-stdin') || argv.includes('--stdin');
+  const stdinToken = shouldReadTokenFromStdin ? readStdin().trim() : '';
+  const token = env.EVEOS_BEAUTY_API_TOKEN?.trim() || stdinToken;
 
   if (!token) {
-    throw new Error('EVEOS_BEAUTY_API_TOKEN is required to save the Beauty API token.');
+    throw new Error(
+      'EVEOS_BEAUTY_API_TOKEN is required to save the Beauty API token, or pass --token-stdin to read it from stdin.'
+    );
   }
 
   return {
@@ -34,11 +41,13 @@ export function resolveBeautyApiConfigInput({
 
 export function saveBeautyApiConfig({
   env = process.env,
+  argv = process.argv.slice(2),
+  readStdin = () => fs.readFileSync(0, 'utf8'),
   createStore = () => new Store(STORE_OPTIONS),
   now = () => new Date(),
   logger = console.log,
 } = {}) {
-  const config = resolveBeautyApiConfigInput({ env, now });
+  const config = resolveBeautyApiConfigInput({ env, argv, readStdin, now });
   const store = createStore();
 
   store.store = config;
@@ -57,13 +66,15 @@ export function saveBeautyApiConfig({
 
 export async function runBeautyApiConfigCli({
   env = process.env,
+  argv = process.argv.slice(2),
+  readStdin = () => fs.readFileSync(0, 'utf8'),
   createStore = () => new Store(STORE_OPTIONS),
   now = () => new Date(),
   logger = console.log,
   errorLogger = console.error,
 } = {}) {
   try {
-    saveBeautyApiConfig({ env, createStore, now, logger });
+    saveBeautyApiConfig({ env, argv, readStdin, createStore, now, logger });
     return { ok: true, exitCode: 0 };
   } catch (error) {
     errorLogger(

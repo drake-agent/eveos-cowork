@@ -135,6 +135,18 @@ the same encrypted app store without printing it:
 EVEOS_BEAUTY_API_TOKEN='...' npm run beauty:save-token
 ```
 
+Safer shell-history path:
+
+```bash
+printf "Beauty API token: "
+stty -echo
+IFS= read -r BEAUTY_TOKEN
+stty echo
+printf "\n"
+printf "%s" "$BEAUTY_TOKEN" | npm run beauty:save-token -- --token-stdin
+unset BEAUTY_TOKEN
+```
+
 Optionally set `EVEOS_BEAUTY_API_BASE_URL` to override the default
 `https://beauty.eveos.one`.
 

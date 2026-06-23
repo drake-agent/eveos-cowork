@@ -17,6 +17,7 @@ describe('Beauty API real smoke script', () => {
     const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')) as {
       scripts: Record<string, string>;
     };
+    const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
 
     expect(pkg.scripts['smoke:beauty-api']).toBe('node scripts/smoke-beauty-api.mjs');
     expect(pkg.scripts['smoke:beauty-real']).toBe(
@@ -25,6 +26,8 @@ describe('Beauty API real smoke script', () => {
     expect(pkg.scripts['beauty:save-token']).toBe('node scripts/save-beauty-api-config.mjs');
     expect(fs.existsSync(path.join(root, 'scripts/smoke-beauty-api.mjs'))).toBe(true);
     expect(fs.existsSync(path.join(root, 'scripts/save-beauty-api-config.mjs'))).toBe(true);
+    expect(readme).toContain('--token-stdin');
+    expect(readme).toContain('Safer shell-history path');
   });
 
   it('checks health and authenticated tools without logging the token', async () => {
@@ -137,6 +140,44 @@ describe('Beauty API real smoke script', () => {
     ]);
     expect(logs.join('\n')).toContain('token=saved');
     expect(logs.join('\n')).not.toContain('save-secret-token');
+  });
+
+  it('saves Beauty API config from stdin without requiring the token in env', async () => {
+    const { saveBeautyApiConfig } = await loadConfigModule();
+    const logs: string[] = [];
+    const writes: unknown[] = [];
+    const fakeStore = {
+      set store(value: unknown) {
+        writes.push(value);
+      },
+    };
+
+    const result = saveBeautyApiConfig({
+      env: {
+        EVEOS_BEAUTY_API_BASE_URL: 'https://beauty.eveos.one/',
+      },
+      argv: ['--token-stdin'],
+      readStdin: () => 'stdin-secret-token\n',
+      createStore: () => fakeStore,
+      now: () => new Date('2026-06-23T14:05:00.000Z'),
+      logger: (message: string) => logs.push(message),
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      baseUrl: 'https://beauty.eveos.one',
+      hasToken: true,
+      updatedAt: '2026-06-23T14:05:00.000Z',
+    });
+    expect(writes).toEqual([
+      {
+        baseUrl: 'https://beauty.eveos.one',
+        token: 'stdin-secret-token',
+        updatedAt: '2026-06-23T14:05:00.000Z',
+      },
+    ]);
+    expect(logs.join('\n')).toContain('token=saved');
+    expect(logs.join('\n')).not.toContain('stdin-secret-token');
   });
 
   it('reports missing token through the config CLI without a stack trace', async () => {
