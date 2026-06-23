@@ -19,6 +19,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 import type { BeautyDecisionPacket } from '../../../shared/ipc-types';
+import {
+  summarizeBeautyQueueSnapshot,
+  type BeautyQueueSummary,
+  type BeautyQueueStatus,
+} from './beauty-queue-summary';
 
 type BeautyStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -55,6 +60,7 @@ export function BeautyCommandDesk() {
   const [run, setRun] = useState<RunState | null>(null);
   const [answer, setAnswer] = useState<unknown>(null);
   const [queue, setQueue] = useState<unknown>(null);
+  const [queueStatus, setQueueStatus] = useState<BeautyStatus>('idle');
   const [packets, setPackets] = useState<BeautyDecisionPacket[]>([]);
   const [selectedPacketId, setSelectedPacketId] = useState('');
   const [exportStatus, setExportStatus] = useState<BeautyStatus>('idle');
@@ -64,6 +70,7 @@ export function BeautyCommandDesk() {
   const beautyApi = window.electronAPI?.beauty;
   const canUseBeautyApi = Boolean(beautyApi);
   const canBuildBrief = form.question.trim().length > 0 && canUseBeautyApi;
+  const queueSummary = useMemo(() => summarizeBeautyQueueSnapshot(queue), [queue]);
 
   const requestPayload = useMemo(
     () => ({
@@ -159,11 +166,26 @@ export function BeautyCommandDesk() {
       setRunStatus('ready');
       const latestQueue = await window.electronAPI.beauty.analystQueue(20);
       setQueue(latestQueue);
+      setQueueStatus('ready');
     } catch (err) {
       setRunStatus('error');
       setError(formatError(err));
     }
   }, [beautyApi, canBuildBrief, requestPayload]);
+
+  const refreshQueue = useCallback(async () => {
+    if (!beautyApi) return;
+    setError('');
+    setQueueStatus('loading');
+    try {
+      const latestQueue = await window.electronAPI.beauty.analystQueue(20);
+      setQueue(latestQueue);
+      setQueueStatus('ready');
+    } catch (err) {
+      setQueueStatus('error');
+      setError(formatError(err));
+    }
+  }, [beautyApi]);
 
   const refreshAnswer = useCallback(async () => {
     if (!beautyApi || !run?.runId) return;
@@ -511,8 +533,20 @@ export function BeautyCommandDesk() {
                   </div>
                 )}
               </Panel>
-              <Panel title="Queue monitor" icon={<Clock className="h-4 w-4" />}>
-                <JsonBlock value={queue || { state: 'No queue snapshot loaded yet.' }} compact />
+              <Panel
+                title="Analyst queue mission control"
+                status={queueStatus}
+                icon={<Clock className="h-4 w-4" />}
+              >
+                <QueueSnapshotPanel summary={queueSummary} />
+                <button
+                  className="btn btn-secondary mt-3 w-full"
+                  onClick={refreshQueue}
+                  disabled={!canUseBeautyApi || queueStatus === 'loading'}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Refresh queue
+                </button>
               </Panel>
               <Panel title="Raw answer" icon={<Database className="h-4 w-4" />}>
                 <JsonBlock
@@ -623,6 +657,102 @@ function AnswerSection({ title, value }: { title: string; value: unknown }) {
         <FormattedValue value={value || 'Not available yet.'} />
       </div>
     </section>
+  );
+}
+
+function QueueSnapshotPanel({ summary }: { summary: BeautyQueueSummary }) {
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-3 gap-2">
+        <QueueMetric label="Running" value={summary.counts.running} tone="running" />
+        <QueueMetric label="Waiting" value={summary.counts.waiting} tone="waiting" />
+        <QueueMetric label="Failed" value={summary.counts.failed} tone="failed" />
+      </div>
+      <div className="rounded-xl border border-border-muted bg-background/55 px-3 py-2 text-xs leading-5 text-text-secondary">
+        <div className="flex items-center justify-between gap-2">
+          <span>{summary.stateLabel}</span>
+          <span className="font-mono tabular-nums">{summary.observedAtLabel}</span>
+        </div>
+        {summary.maxWorkers ? (
+          <div className="mt-1 text-text-muted">Analyst lanes: {summary.maxWorkers}</div>
+        ) : null}
+        {summary.isStale ? (
+          <div className="mt-1 text-warning">Queue snapshot is stale. Refresh before triage.</div>
+        ) : null}
+      </div>
+      {summary.rows.length === 0 ? (
+        <p className="text-sm leading-6 text-text-muted">No queued or running analyst jobs.</p>
+      ) : (
+        <div className="space-y-2">
+          {summary.rows.slice(0, 5).map((row) => (
+            <div
+              key={row.id}
+              className="rounded-xl border border-border-muted bg-background/55 px-3 py-2"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="truncate text-[13px] font-medium text-text-primary">
+                    {row.label}
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-1 text-[11px] text-text-muted">
+                    <span>{row.id}</span>
+                    {row.market ? <span>{row.market}</span> : null}
+                    {row.brand ? <span>{row.brand}</span> : null}
+                    {row.product ? <span>{row.product}</span> : null}
+                  </div>
+                </div>
+                <QueueStatusBadge status={row.status} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function QueueMetric({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: BeautyQueueStatus;
+}) {
+  const className =
+    tone === 'running'
+      ? 'border-success/20 bg-success/10 text-success'
+      : tone === 'waiting'
+        ? 'border-warning/20 bg-warning/10 text-warning'
+        : tone === 'failed'
+          ? 'border-error/20 bg-error/10 text-error'
+          : 'border-border-muted bg-background/55 text-text-secondary';
+
+  return (
+    <div className={`rounded-xl border px-3 py-2 ${className}`}>
+      <div className="text-[11px] font-medium">{label}</div>
+      <div className="mt-1 font-mono text-lg tabular-nums">{value}</div>
+    </div>
+  );
+}
+
+function QueueStatusBadge({ status }: { status: BeautyQueueStatus }) {
+  const className =
+    status === 'running'
+      ? 'border-success/20 bg-success/10 text-success'
+      : status === 'waiting'
+        ? 'border-warning/20 bg-warning/10 text-warning'
+        : status === 'failed'
+          ? 'border-error/20 bg-error/10 text-error'
+          : status === 'succeeded'
+            ? 'border-accent/20 bg-accent-muted text-accent'
+            : 'border-border-muted bg-background/55 text-text-muted';
+
+  return (
+    <span className={`rounded-full border px-2 py-1 text-[11px] capitalize ${className}`}>
+      {status}
+    </span>
   );
 }
 

@@ -32,6 +32,7 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('window.electronAPI.beauty.saveConfig');
     expect(desk).toContain('window.electronAPI.beauty.intentBrief');
     expect(desk).toContain('window.electronAPI.beauty.analystRun');
+    expect(desk).toContain('window.electronAPI.beauty.analystQueue');
     expect(desk).toContain('window.electronAPI.beauty.answerResult');
     expect(desk).toContain('window.electronAPI.beauty.savePacket');
     expect(desk).toContain('window.electronAPI.beauty.listPackets');
@@ -44,6 +45,10 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('Save packet');
     expect(desk).toContain('Export packet');
     expect(desk).toContain('Saved reports/history');
+    expect(desk).toContain('Analyst queue mission control');
+    expect(desk).toContain('Refresh queue');
+    expect(desk).toContain('QueueSnapshotPanel');
+    expect(desk).toContain('summarizeBeautyQueueSnapshot');
     expect(desk).toContain('Team access');
     expect(desk).toContain('Cloudflare Access');
     expect(desk).toContain('Bearer token stays in Electron main');
