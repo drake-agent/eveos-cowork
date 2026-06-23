@@ -42,6 +42,12 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('Citations');
     expect(desk).toContain('Missing data warnings');
     expect(desk).toContain('Confidence');
+    expect(desk).toContain('Evidence packet browser');
+    expect(desk).toContain('EvidenceSourcePanel');
+    expect(desk).toContain('summarizeBeautyEvidence');
+    expect(desk).toContain('sourceTable');
+    expect(desk).toContain('artifactPath');
+    expect(desk).toContain('missingSourceWarning');
     expect(desk).toContain('Save packet');
     expect(desk).toContain('Export packet');
     expect(desk).toContain('Saved reports/history');

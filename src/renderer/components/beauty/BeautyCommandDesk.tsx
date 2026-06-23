@@ -9,6 +9,7 @@ import {
   Clock,
   Database,
   Download,
+  ExternalLink,
   FileText,
   Lock,
   Play,
@@ -24,6 +25,7 @@ import {
   type BeautyQueueSummary,
   type BeautyQueueStatus,
 } from './beauty-queue-summary';
+import { summarizeBeautyEvidence, type BeautyEvidenceSummary } from './beauty-evidence-summary';
 
 type BeautyStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -71,6 +73,7 @@ export function BeautyCommandDesk() {
   const canUseBeautyApi = Boolean(beautyApi);
   const canBuildBrief = form.question.trim().length > 0 && canUseBeautyApi;
   const queueSummary = useMemo(() => summarizeBeautyQueueSnapshot(queue), [queue]);
+  const evidenceSummary = useMemo(() => summarizeBeautyEvidence(answer), [answer]);
 
   const requestPayload = useMemo(
     () => ({
@@ -477,6 +480,10 @@ export function BeautyCommandDesk() {
                   </button>
                 </div>
               </Panel>
+
+              <Panel title="Evidence packet browser" icon={<Database className="h-4 w-4" />}>
+                <EvidenceSourcePanel summary={evidenceSummary} />
+              </Panel>
             </div>
 
             <aside className="space-y-4">
@@ -707,6 +714,97 @@ function QueueSnapshotPanel({ summary }: { summary: BeautyQueueSummary }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function EvidenceSourcePanel({ summary }: { summary: BeautyEvidenceSummary }) {
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <EvidenceMetric label="Rows" value={summary.counts.total} />
+        <EvidenceMetric label="URLs" value={summary.counts.withSourceUrl} />
+        <EvidenceMetric label="Artifacts" value={summary.counts.withArtifactPath} />
+        <EvidenceMetric label="Missing" value={summary.counts.missingSource} warning />
+      </div>
+      {summary.rows.length === 0 ? (
+        <p className="text-sm leading-6 text-text-muted">{summary.stateLabel}</p>
+      ) : (
+        <div className="space-y-2">
+          {summary.rows.slice(0, 6).map((row) => (
+            <div
+              key={row.id}
+              className="rounded-xl border border-border-muted bg-background/55 px-3 py-2"
+            >
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1 text-[11px] text-text-muted">
+                    <span>{row.id}</span>
+                    {row.sourceTable ? <span>source_table {row.sourceTable}</span> : null}
+                    {row.layer ? <span>{row.layer}</span> : null}
+                    {row.confidence ? <span>confidence {row.confidence}</span> : null}
+                  </div>
+                  <p className="mt-1 text-sm leading-6 text-text-primary">{row.evidenceText}</p>
+                  {row.artifactPath ? (
+                    <div className="mt-1 truncate font-mono text-[11px] text-text-muted">
+                      artifact_path {row.artifactPath}
+                    </div>
+                  ) : null}
+                  {row.missingSourceWarning ? (
+                    <div className="mt-1 text-[11px] text-warning">
+                      Missing source URL or artifact path.
+                    </div>
+                  ) : null}
+                </div>
+                {isOpenableSourceUrl(row.sourceUrl) ? (
+                  <button
+                    className="btn btn-secondary min-h-8 flex-shrink-0 px-2 text-[12px]"
+                    onClick={() => openEvidenceSourceUrl(row.sourceUrl)}
+                    title="Open source URL"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    Source
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function isOpenableSourceUrl(sourceUrl: string | undefined): sourceUrl is string {
+  return /^https?:\/\//i.test(sourceUrl || '');
+}
+
+function openEvidenceSourceUrl(sourceUrl: string | undefined): void {
+  if (!isOpenableSourceUrl(sourceUrl)) {
+    return;
+  }
+  window.electronAPI.openExternal(sourceUrl);
+}
+
+function EvidenceMetric({
+  label,
+  value,
+  warning = false,
+}: {
+  label: string;
+  value: number;
+  warning?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-xl border px-3 py-2 ${
+        warning && value > 0
+          ? 'border-warning/20 bg-warning/10 text-warning'
+          : 'border-border-muted bg-background/55 text-text-secondary'
+      }`}
+    >
+      <div className="text-[11px] font-medium">{label}</div>
+      <div className="mt-1 font-mono text-lg tabular-nums">{value}</div>
     </div>
   );
 }
