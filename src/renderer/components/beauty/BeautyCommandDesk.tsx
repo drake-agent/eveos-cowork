@@ -8,6 +8,7 @@ import {
   CircleDashed,
   Clock,
   Database,
+  Download,
   FileText,
   Lock,
   Play,
@@ -56,6 +57,8 @@ export function BeautyCommandDesk() {
   const [queue, setQueue] = useState<unknown>(null);
   const [packets, setPackets] = useState<BeautyDecisionPacket[]>([]);
   const [selectedPacketId, setSelectedPacketId] = useState('');
+  const [exportStatus, setExportStatus] = useState<BeautyStatus>('idle');
+  const [exportMessage, setExportMessage] = useState('');
   const [error, setError] = useState('');
 
   const beautyApi = window.electronAPI?.beauty;
@@ -220,6 +223,29 @@ export function BeautyCommandDesk() {
         setBriefStatus(packet.brief ? 'ready' : 'idle');
         setRunStatus('ready');
       } catch (err) {
+        setError(formatError(err));
+      }
+    },
+    [beautyApi]
+  );
+
+  const exportPacket = useCallback(
+    async (packetId: string) => {
+      if (!beautyApi) return;
+      setError('');
+      setExportStatus('loading');
+      setExportMessage('');
+      try {
+        const result = await window.electronAPI.beauty.exportPacket({ id: packetId });
+        if (!result.success) {
+          setExportStatus('error');
+          setError(result.error || 'Packet export failed');
+          return;
+        }
+        setExportStatus('ready');
+        setExportMessage(result.path ? `Exported to ${result.path}` : 'Packet exported.');
+      } catch (err) {
+        setExportStatus('error');
         setError(formatError(err));
       }
     },
@@ -432,7 +458,16 @@ export function BeautyCommandDesk() {
             </div>
 
             <aside className="space-y-4">
-              <Panel title="Saved reports/history" icon={<Archive className="h-4 w-4" />}>
+              <Panel
+                title="Saved reports/history"
+                status={exportStatus}
+                icon={<Archive className="h-4 w-4" />}
+              >
+                {exportMessage ? (
+                  <p className="mb-3 rounded-xl border border-success/20 bg-success/10 px-3 py-2 text-xs leading-5 text-success">
+                    {exportMessage}
+                  </p>
+                ) : null}
                 {packets.length === 0 ? (
                   <p className="text-sm leading-6 text-text-muted">
                     No saved packets for this market and brand yet.
@@ -440,25 +475,38 @@ export function BeautyCommandDesk() {
                 ) : (
                   <div className="space-y-2">
                     {packets.map((packet) => (
-                      <button
+                      <div
                         key={packet.id}
-                        onClick={() => loadPacketIntoDesk(packet.id)}
-                        className={`w-full rounded-xl border px-3 py-2 text-left transition-colors ${
+                        className={`flex w-full items-start gap-2 rounded-xl border px-3 py-2 transition-colors ${
                           selectedPacketId === packet.id
                             ? 'border-accent/40 bg-accent-muted/50'
                             : 'border-border-muted bg-background/55 hover:bg-surface-hover'
                         }`}
                       >
-                        <div className="line-clamp-2 text-[13px] font-medium leading-5 text-text-primary">
-                          {packet.question}
-                        </div>
-                        <div className="mt-1 flex flex-wrap gap-1 text-[11px] text-text-muted">
-                          <span>{packet.market || 'global'}</span>
-                          {packet.brand ? <span>{packet.brand}</span> : null}
-                          {packet.product ? <span>{packet.product}</span> : null}
-                          <span>{formatDate(packet.updatedAt)}</span>
-                        </div>
-                      </button>
+                        <button
+                          onClick={() => loadPacketIntoDesk(packet.id)}
+                          className="min-w-0 flex-1 text-left"
+                        >
+                          <div className="line-clamp-2 text-[13px] font-medium leading-5 text-text-primary">
+                            {packet.question}
+                          </div>
+                          <div className="mt-1 flex flex-wrap gap-1 text-[11px] text-text-muted">
+                            <span>{packet.market || 'global'}</span>
+                            {packet.brand ? <span>{packet.brand}</span> : null}
+                            {packet.product ? <span>{packet.product}</span> : null}
+                            <span>{formatDate(packet.updatedAt)}</span>
+                          </div>
+                        </button>
+                        <button
+                          className="btn btn-secondary min-h-8 flex-shrink-0 px-2 text-[12px]"
+                          onClick={() => exportPacket(packet.id)}
+                          disabled={exportStatus === 'loading'}
+                          title="Export packet"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          Export
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}

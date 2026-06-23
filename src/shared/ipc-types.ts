@@ -112,6 +112,17 @@ export interface BeautyPacketListFilters {
   limit?: number;
 }
 
+export interface BeautyPacketExportInput {
+  id: string;
+  targetPath?: string;
+}
+
+export interface BeautyPacketExportResult {
+  success: boolean;
+  path?: string;
+  error?: string;
+}
+
 // ---------------------------------------------------------------------------
 // Remote
 // ---------------------------------------------------------------------------

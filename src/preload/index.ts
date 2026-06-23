@@ -42,6 +42,8 @@ import type {
   BeautyConfigInput,
   BeautyDecisionPacket,
   BeautyDecisionPacketInput,
+  BeautyPacketExportInput,
+  BeautyPacketExportResult,
   BeautyPacketListFilters,
   BeautyPublicConfig,
   BeautyQuestionRequest,
@@ -240,6 +242,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.invoke('beauty.getPacket', id),
     deletePacket: (id: string): Promise<{ success: boolean }> =>
       ipcRenderer.invoke('beauty.deletePacket', id),
+    exportPacket: (input: BeautyPacketExportInput): Promise<BeautyPacketExportResult> =>
+      ipcRenderer.invoke('beauty.exportPacket', input),
   },
 
   // Skills methods
@@ -545,6 +549,7 @@ declare global {
         listPackets: (filters?: BeautyPacketListFilters) => Promise<BeautyDecisionPacket[]>;
         getPacket: (id: string) => Promise<BeautyDecisionPacket | null>;
         deletePacket: (id: string) => Promise<{ success: boolean }>;
+        exportPacket: (input: BeautyPacketExportInput) => Promise<BeautyPacketExportResult>;
       };
       skills: {
         getAll: () => Promise<Skill[]>;

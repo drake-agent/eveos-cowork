@@ -35,12 +35,14 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('window.electronAPI.beauty.answerResult');
     expect(desk).toContain('window.electronAPI.beauty.savePacket');
     expect(desk).toContain('window.electronAPI.beauty.listPackets');
+    expect(desk).toContain('window.electronAPI.beauty.exportPacket');
     expect(desk).toContain('Observed facts');
     expect(desk).toContain('Inference');
     expect(desk).toContain('Citations');
     expect(desk).toContain('Missing data warnings');
     expect(desk).toContain('Confidence');
     expect(desk).toContain('Save packet');
+    expect(desk).toContain('Export packet');
     expect(desk).toContain('Saved reports/history');
     expect(desk).toContain('Team access');
     expect(desk).toContain('Cloudflare Access');
@@ -48,6 +50,7 @@ describe('Beauty Command Desk wiring', () => {
     expect(desk).toContain('Sparkles');
     expect(desk).toContain('ShieldCheck');
     expect(desk).toContain('RefreshCw');
+    expect(desk).toContain('Download');
   });
 
   it('uses mobile-safe Beauty layout classes and visible disabled button styling', () => {

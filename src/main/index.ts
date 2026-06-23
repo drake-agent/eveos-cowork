@@ -90,6 +90,10 @@ import { buildDiagnosticsSummary } from './utils/diagnostics-summary';
 import { registerBeautyIpcHandlers } from './beauty/beauty-ipc';
 import { beautyConfigStore } from './beauty/beauty-config-store';
 import { getBeautyPacketStore } from './beauty/beauty-packet-store';
+import {
+  exportBeautyDecisionPacket,
+  getBeautyPacketExportFilename,
+} from './beauty/beauty-packet-export';
 
 // Current working directory (persisted between sessions)
 let currentWorkingDir: string | null = null;
@@ -1397,6 +1401,35 @@ ipcMain.handle('dialog.selectFiles', async () => {
 registerBeautyIpcHandlers(ipcMain, {
   configStore: beautyConfigStore,
   packetStore: getBeautyPacketStore(),
+  packetExporter: async (packet, input) => {
+    let targetPath = input.targetPath;
+    if (!targetPath) {
+      const result = mainWindow
+        ? await dialog.showSaveDialog(mainWindow, {
+            title: 'Export Beauty decision packet',
+            defaultPath: getBeautyPacketExportFilename(packet),
+            filters: [
+              { name: 'Markdown', extensions: ['md'] },
+              { name: 'All Files', extensions: ['*'] },
+            ],
+          })
+        : await dialog.showSaveDialog({
+            title: 'Export Beauty decision packet',
+            defaultPath: getBeautyPacketExportFilename(packet),
+            filters: [
+              { name: 'Markdown', extensions: ['md'] },
+              { name: 'All Files', extensions: ['*'] },
+            ],
+          });
+
+      if (result.canceled || !result.filePath) {
+        return { success: false, error: 'User cancelled' };
+      }
+      targetPath = result.filePath;
+    }
+
+    return exportBeautyDecisionPacket(packet, targetPath);
+  },
   logError,
 });
 

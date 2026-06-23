@@ -162,4 +162,53 @@ describe('registerBeautyIpcHandlers', () => {
       success: true,
     });
   });
+
+  it('exports saved decision packets through an injected main-process exporter', async () => {
+    const ipc = new FakeIpcMain();
+    const packetStore = createPacketStore();
+    const packetExporter = vi.fn(async (_packet: unknown, input: { targetPath?: string }) => ({
+      success: true,
+      path: input.targetPath || '/tmp/eveos-beauty-packet.md',
+    }));
+
+    registerBeautyIpcHandlers(ipc, {
+      configStore: createConfigStore(),
+      packetStore,
+      packetExporter,
+      createClient: () => ({
+        health: vi.fn(),
+        tools: vi.fn(),
+        intentBrief: vi.fn(),
+        startAnalystRun: vi.fn(),
+        answerResult: vi.fn(),
+        analystQueue: vi.fn(),
+      }),
+    } as Parameters<typeof registerBeautyIpcHandlers>[1]);
+
+    const saved = await ipc.invoke('beauty.savePacket', {
+      question: 'How should BANILA CO renew Clean It Zero Original?',
+      market: 'KR',
+      brand: 'BANILA CO',
+      answer: { citations: [{ source_table: 'evidence_cards' }] },
+    });
+
+    await expect(
+      ipc.invoke('beauty.exportPacket', {
+        id: 'packet-1',
+        targetPath: '/tmp/clean-it-zero.md',
+      })
+    ).resolves.toEqual({
+      success: true,
+      path: '/tmp/clean-it-zero.md',
+    });
+
+    expect(packetExporter).toHaveBeenCalledWith(saved, {
+      id: 'packet-1',
+      targetPath: '/tmp/clean-it-zero.md',
+    });
+    await expect(ipc.invoke('beauty.exportPacket', { id: 'missing' })).resolves.toEqual({
+      success: false,
+      error: 'Packet not found',
+    });
+  });
 });

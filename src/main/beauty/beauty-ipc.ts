@@ -7,10 +7,12 @@ import {
 } from './beauty-api-client';
 import type { BeautyConfigInput, BeautyConfigStoreLike } from './beauty-config-store';
 import type {
+  BeautyDecisionPacket,
   BeautyDecisionPacketInput,
   BeautyPacketListFilters,
   BeautyPacketStoreLike,
 } from './beauty-packet-store';
+import type { BeautyPacketExportInput, BeautyPacketExportResult } from '../../shared/ipc-types';
 
 interface IpcMainLike {
   handle(channel: string, listener: (event: unknown, ...args: unknown[]) => unknown): void;
@@ -28,6 +30,10 @@ interface BeautyApiClientLike {
 interface RegisterBeautyIpcOptions {
   configStore: BeautyConfigStoreLike;
   packetStore?: BeautyPacketStoreLike;
+  packetExporter?: (
+    packet: BeautyDecisionPacket,
+    input: BeautyPacketExportInput
+  ) => BeautyPacketExportResult | Promise<BeautyPacketExportResult>;
   createClient?: () => BeautyApiClientLike;
   logError?: (...args: unknown[]) => void;
 }
@@ -103,6 +109,24 @@ export function registerBeautyIpcHandlers(
     ipcMain.handle('beauty.deletePacket', (_event, id: unknown) => ({
       success: Boolean(options.packetStore?.delete(String(id))),
     }));
+
+    ipcMain.handle('beauty.exportPacket', async (_event, input: unknown) => {
+      if (!options.packetExporter) {
+        return { success: false, error: 'Packet export is not configured' };
+      }
+      const exportInput = normalizePacketExportInput(input);
+      const packet = options.packetStore?.get(exportInput.id);
+      if (!packet) {
+        return { success: false, error: 'Packet not found' };
+      }
+      try {
+        return await options.packetExporter(packet, exportInput);
+      } catch (error) {
+        const safeMessage = toSafeBeautyErrorMessage(error);
+        options.logError?.('[BeautyPacketExport]', safeMessage);
+        return { success: false, error: safeMessage };
+      }
+    });
   }
 }
 
@@ -127,4 +151,15 @@ function toSafeBeautyErrorMessage(error: unknown): string {
     return redactBeautyApiSecret(error.message);
   }
   return redactBeautyApiSecret(String(error));
+}
+
+function normalizePacketExportInput(input: unknown): BeautyPacketExportInput {
+  if (!input || typeof input !== 'object') {
+    return { id: String(input || '') };
+  }
+  const record = input as Record<string, unknown>;
+  return {
+    id: String(record.id || ''),
+    targetPath: typeof record.targetPath === 'string' ? record.targetPath : undefined,
+  };
 }
