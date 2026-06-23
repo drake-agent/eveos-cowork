@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const FALLBACK_USER_DATA_DIR = path.join(process.cwd(), '.cowork-user-data');
+const FALLBACK_USER_DATA_DIR = path.join(process.cwd(), '.eveos-beauty-user-data');
 const FALLBACK_LOGS_DIR = path.join(FALLBACK_USER_DATA_DIR, 'logs');
 
 describe('logger fallback behavior', () => {
@@ -112,5 +112,4 @@ describe('logger fallback behavior', () => {
     consoleSpy.mockRestore();
     logger.closeLogFile();
   });
-
 });

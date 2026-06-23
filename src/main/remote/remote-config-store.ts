@@ -34,6 +34,7 @@ class RemoteConfigStore {
     this.store = createEncryptedStoreWithKeyRotation<RemoteConfigRecord>({
       stableKey: 'open-cowork-remote-stable-v1',
       legacyKeys: [
+        'eveos-beauty-remote-stable-v1',
         'open-cowork-remote-v1',
         ...getLegacyDerivedKeyHexes({
           moduleDirname: __dirname,
@@ -44,7 +45,7 @@ class RemoteConfigStore {
       ],
       storeOptions: {
         name: 'remote-config',
-        projectName: 'open-cowork',
+        projectName: 'eveos-cowork',
         defaults: {
           ...DEFAULT_REMOTE_CONFIG,
           pairedUsers: [],

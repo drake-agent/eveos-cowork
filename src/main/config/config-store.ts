@@ -515,7 +515,7 @@ export class ConfigStore {
   constructor() {
     const storeOptions: StoreOptions<AppConfig> & { projectName?: string } = {
       name: 'config',
-      projectName: 'open-cowork',
+      projectName: 'eveos-cowork',
       defaults: defaultConfig,
     };
 
@@ -525,6 +525,7 @@ export class ConfigStore {
     this.store = createEncryptedStoreWithKeyRotation<AppConfigRecord>({
       stableKey: 'open-cowork-config-stable-v1',
       legacyKeys: [
+        'eveos-beauty-config-stable-v1',
         'open-cowork-config-v1',
         ...getLegacyDerivedKeyHexes({
           moduleDirname: __dirname,

@@ -72,4 +72,43 @@ describe('EveOS Beauty product identity', () => {
     expect(fs.existsSync(path.join(root, 'public/favicon.png'))).toBe(true);
     expect(fs.existsSync(path.join(root, 'src/renderer/assets/logo.png'))).toBe(true);
   });
+
+  it('uses EveOS Beauty identity in active runtime storage, logs, MCP, and web metadata', () => {
+    expect(read('src/main/config/config-store.ts')).toContain("projectName: 'eveos-cowork'");
+    expect(read('src/main/config/config-store.ts')).toContain(
+      "stableKey: 'open-cowork-config-stable-v1'"
+    );
+    expect(read('src/main/config/config-store.ts')).toContain("'eveos-beauty-config-stable-v1'");
+    expect(read('src/main/remote/remote-config-store.ts')).toContain("projectName: 'eveos-cowork'");
+    expect(read('src/main/remote/remote-config-store.ts')).toContain(
+      "stableKey: 'open-cowork-remote-stable-v1'"
+    );
+    expect(read('src/main/remote/remote-config-store.ts')).toContain(
+      "'eveos-beauty-remote-stable-v1'"
+    );
+    expect(read('src/main/skills/plugin-registry-store.ts')).toContain(
+      "projectName: 'eveos-cowork'"
+    );
+    expect(read('src/main/mcp/mcp-config-store.ts')).toContain("projectName: 'eveos-cowork'");
+
+    for (const file of [
+      'src/main/utils/logger.ts',
+      'src/main/mcp/mcp-logger.ts',
+      'src/main/mcp/gui-operate-server.ts',
+    ]) {
+      expect(read(file)).toContain('EveOS Beauty');
+      expect(read(file)).not.toContain('Open Cowork');
+    }
+
+    expect(read('src/main/skills/plugin-catalog-service.ts')).toContain(
+      "DEFAULT_USER_AGENT = 'eveos-beauty-plugin-catalog/0.1'"
+    );
+    expect(read('src/main/mcp/mcp-manager.ts')).toContain("name: 'eveos-beauty'");
+    expect(read('src/main/tools/tool-executor.ts')).toContain(
+      "headers: { 'User-Agent': 'eveos-beauty' }"
+    );
+    expect(read('src/main/tools/sandbox-tool-executor.ts')).toContain(
+      "headers: { 'User-Agent': 'eveos-beauty' }"
+    );
+  });
 });

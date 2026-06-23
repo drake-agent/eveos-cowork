@@ -761,7 +761,7 @@ export class MCPManager {
     // and the authenticated reconnect.
     const client = new Client(
       {
-        name: 'open-cowork',
+        name: 'eveos-beauty',
         version: '0.1.0',
       },
       {

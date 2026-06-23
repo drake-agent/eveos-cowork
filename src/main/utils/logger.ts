@@ -90,7 +90,7 @@ function resolveUserDataPath(): string {
     // Fallback to local path when Electron app context is unavailable
   }
 
-  return path.join(process.cwd(), '.cowork-user-data');
+  return path.join(process.cwd(), '.eveos-beauty-user-data');
 }
 
 function resolveAppVersion(): string {
@@ -135,7 +135,7 @@ function initLogFile(): void {
     // Write header
     const header = `
 ================================================================================
-Open Cowork Application Log
+EveOS Beauty Application Log
 Started: ${new Date().toISOString()}
 Platform: ${process.platform}
 Arch: ${process.arch}
