@@ -98,6 +98,7 @@ npm run typecheck
 npm run lint
 npm run smoke:electron
 npm run smoke:package-app
+npm run smoke:dmg
 npm run smoke:beauty-real
 npm test -- --run
 ```
@@ -194,7 +195,8 @@ The app should feel like a refined internal operating console:
 
 ## Current Limits
 
-- Full installer/notarized package smoke still needs a local secure-token pass.
+- Authenticated live Beauty API smoke still needs a local secure-token pass.
+- Notarized installer smoke is still outside the current unsigned DMG check.
 - Source checkout real-API smoke is available through `npm run smoke:beauty-real`.
 - Analyst runs are intentionally not started in automated smoke tests.
 - Team rollout depends on Cloudflare Access policy configuration outside this

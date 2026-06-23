@@ -54,7 +54,7 @@
     "preview": "vite preview",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "test": "npm run rebuild:node && vitest",
+    "test": "node scripts/run-node-tests.mjs",
     "test:coverage": "vitest run --coverage",
     "bench": "vitest bench",
     "bench:api": "node scripts/bench-api.mjs",

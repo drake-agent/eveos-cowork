@@ -490,6 +490,7 @@ npm test -- --run
 npm run lint
 npm run smoke:electron
 npm run smoke:package-app
+npm run smoke:dmg
 npm run dev
 ```
 
@@ -575,5 +576,8 @@ client, command desk, local decision packets, native-module smoke hardening,
 EveOS Beauty / BANILA-style identity pass, export/share UX, analyst queue
 mission control, evidence packet browsing, and Cloudflare Access team
 enrollment readiness. Source-checkout real-API smoke is available through
-`npm run smoke:beauty-real`. Remaining follow-up work should focus on full
-installer/notarized package smoke and deeper team rollout hardening.
+`npm run smoke:beauty-real`, packaged app smoke is available through
+`npm run smoke:package-app`, and unsigned macOS DMG structure smoke is available
+through `npm run smoke:dmg`. Remaining follow-up work should focus on saving a
+real local Beauty API token for authenticated live smoke, notarized installer
+checks, and deeper team rollout hardening.

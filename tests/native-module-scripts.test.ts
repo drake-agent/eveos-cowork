@@ -16,7 +16,7 @@ describe('native module scripts', () => {
     expect(pkg.scripts.rebuild).toBe('node scripts/rebuild-native-modules.js electron');
     expect(pkg.scripts['rebuild:electron']).toBe('node scripts/rebuild-native-modules.js electron');
     expect(pkg.scripts['rebuild:node']).toBe('node scripts/rebuild-native-modules.js node');
-    expect(pkg.scripts.test).toBe('npm run rebuild:node && vitest');
+    expect(pkg.scripts.test).toBe('node scripts/run-node-tests.mjs');
     expect(pkg.scripts.rebuild).not.toContain('--runtime=');
     expect(pkg.scripts.rebuild).not.toContain('--target=');
     expect(pkg.scripts.rebuild).not.toContain('--disturl=');
