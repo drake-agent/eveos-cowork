@@ -457,14 +457,13 @@ npm run dev
 API smoke checks without printing secrets:
 
 ```bash
-curl -sS -o /tmp/beauty_health.json -w '%{http_code}\n' https://beauty.eveos.one/health
-curl -sS -o /tmp/beauty_tools_noauth.json -w '%{http_code}\n' https://beauty.eveos.one/tools
-TOKEN="$(security find-generic-password -s eveos-beauty-api-token -w 2>/dev/null || true)"
-curl -sS -o /tmp/beauty_tools_auth.json -w '%{http_code}\n' \
-  -H "Authorization: Bearer ${TOKEN}" \
-  https://beauty.eveos.one/tools
-unset TOKEN
+npm run smoke:beauty-real
 ```
+
+`smoke:beauty-real` runs the Electron production startup smoke and then checks
+Beauty API `/health` plus authenticated `/tools`. The API smoke reads either
+the encrypted `beauty-api` app store or `EVEOS_BEAUTY_API_TOKEN`; it must not
+print the bearer token.
 
 Screenshot checks:
 
@@ -536,5 +535,6 @@ The fork exists at `/Users/drake/Projects/eveos-cowork` on branch
 client, command desk, local decision packets, native-module smoke hardening,
 EveOS Beauty / BANILA-style identity pass, export/share UX, analyst queue
 mission control, evidence packet browsing, and Cloudflare Access team
-enrollment readiness. Remaining follow-up work should focus on real-token
-packaged smoke and deeper team rollout hardening.
+enrollment readiness. Source-checkout real-API smoke is available through
+`npm run smoke:beauty-real`. Remaining follow-up work should focus on full
+installer/notarized package smoke and deeper team rollout hardening.

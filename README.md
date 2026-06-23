@@ -97,6 +97,7 @@ Useful verification commands:
 npm run typecheck
 npm run lint
 npm run smoke:electron
+npm run smoke:beauty-real
 npm test -- --run
 ```
 
@@ -124,6 +125,16 @@ Team rollout sequence:
 5. Confirm the Team access panel shows gateway and token readiness.
 
 Do not commit tokens, cookies, tunnel credentials, or Cloudflare API keys.
+
+After saving the token, run:
+
+```bash
+npm run smoke:beauty-real
+```
+
+The smoke command starts the Electron production smoke and then checks Beauty
+API `/health` plus authenticated `/tools`. It reads either the encrypted
+`beauty-api` app store or `EVEOS_BEAUTY_API_TOKEN`; it does not print the token.
 
 ## Security Model
 
@@ -160,7 +171,8 @@ The app should feel like a refined internal operating console:
 
 ## Current Limits
 
-- Packaged-app smoke with a real token still needs a local secure-token pass.
+- Full installer/notarized package smoke still needs a local secure-token pass.
+- Source checkout real-API smoke is available through `npm run smoke:beauty-real`.
 - Analyst runs are intentionally not started in automated smoke tests.
 - Team rollout depends on Cloudflare Access policy configuration outside this
   repository.

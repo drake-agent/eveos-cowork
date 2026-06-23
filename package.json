@@ -62,6 +62,8 @@
     "rebuild:electron": "node scripts/rebuild-native-modules.js electron",
     "rebuild:node": "node scripts/rebuild-native-modules.js node",
     "smoke:electron": "npm run rebuild:electron && vite build && electron . --smoke-test",
+    "smoke:beauty-api": "node scripts/smoke-beauty-api.mjs",
+    "smoke:beauty-real": "npm run smoke:electron && npm run smoke:beauty-api",
     "typecheck": "tsc --noEmit",
     "pre-build-check": "node scripts/pre-build-check.js",
     "clean": "rimraf dist dist-electron dist-mcp dist-wsl-agent dist-lima-agent .bundle-resources release",
