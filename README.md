@@ -151,10 +151,13 @@ For release readiness after `npm run build`, run:
 
 ```bash
 npm run smoke:package-app
+npm run smoke:dmg
 ```
 
 This launches the built `EveOS Beauty.app` with `--smoke-test` and verifies the
-packaged Electron runtime and native modules.
+packaged Electron runtime and native modules, then mounts the generated macOS
+DMG read-only and verifies that it contains the app bundle and Applications
+symlink.
 
 ## Security Model
 

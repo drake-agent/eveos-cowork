@@ -41,10 +41,12 @@ describe('native module scripts', () => {
       'npm run rebuild:electron && vite build && electron . --smoke-test'
     );
     expect(pkg.scripts['smoke:package-app']).toBe('node scripts/smoke-packaged-app.mjs');
+    expect(pkg.scripts['smoke:dmg']).toBe('node scripts/smoke-dmg.mjs');
     expect(pkg.scripts['smoke:package-real']).toBe(
-      'npm run build && npm run smoke:package-app && npm run smoke:beauty-api'
+      'npm run build && npm run smoke:package-app && npm run smoke:dmg && npm run smoke:beauty-api'
     );
     expect(fs.existsSync(path.join(root, 'scripts/smoke-packaged-app.mjs'))).toBe(true);
+    expect(fs.existsSync(path.join(root, 'scripts/smoke-dmg.mjs'))).toBe(true);
   });
 
   it('rebuilds Electron native modules before starting the dev Electron app', () => {
