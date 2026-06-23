@@ -97,6 +97,7 @@ Useful verification commands:
 npm run typecheck
 npm run lint
 npm run smoke:electron
+npm run smoke:package-app
 npm run smoke:beauty-real
 npm test -- --run
 ```
@@ -135,6 +136,15 @@ npm run smoke:beauty-real
 The smoke command starts the Electron production smoke and then checks Beauty
 API `/health` plus authenticated `/tools`. It reads either the encrypted
 `beauty-api` app store or `EVEOS_BEAUTY_API_TOKEN`; it does not print the token.
+
+For release readiness after `npm run build`, run:
+
+```bash
+npm run smoke:package-app
+```
+
+This launches the built `EveOS Beauty.app` with `--smoke-test` and verifies the
+packaged Electron runtime and native modules.
 
 ## Security Model
 

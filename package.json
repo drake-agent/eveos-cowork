@@ -64,6 +64,8 @@
     "smoke:electron": "npm run rebuild:electron && vite build && electron . --smoke-test",
     "smoke:beauty-api": "node scripts/smoke-beauty-api.mjs",
     "smoke:beauty-real": "npm run smoke:electron && npm run smoke:beauty-api",
+    "smoke:package-app": "node scripts/smoke-packaged-app.mjs",
+    "smoke:package-real": "npm run build && npm run smoke:package-app && npm run smoke:beauty-api",
     "typecheck": "tsc --noEmit",
     "pre-build-check": "node scripts/pre-build-check.js",
     "clean": "rimraf dist dist-electron dist-mcp dist-wsl-agent dist-lima-agent .bundle-resources release",

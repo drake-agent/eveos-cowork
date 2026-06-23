@@ -50,11 +50,14 @@ Taste dials:
 | Beauty bearer auth | `GET https://beauty.eveos.one/tools` returns HTTP `200` with the Anna Beauty API token. | Token read from Anna and used without printing it |
 | Existing client-flow doc | The current recommended MVP is question input -> intent brief preview -> run analyst -> answer page with citations -> saved run history. | `/Users/drake/Documents/New project/anna-beauty-team-access/opencowork-client-flow.md` |
 | Existing concurrency doc | Read-only lookup can support more users; Opus/max-thinking analyst execution should start at 1 active worker. | `/Users/drake/Documents/New project/anna-beauty-team-access/concurrency.md` |
-| CoWork OS repo | `cowork-os/cowork-os` describes itself as a "GUI-first, CLI-capable local AI super app and everything app for getting real work done." | [GitHub](https://github.com/cowork-os/cowork-os) and `/tmp/cowork-os-inspect/README.md` |
-| CoWork OS package | `package.json` name is `cowork-os`, version `0.5.49`, license `MIT`, Node engine `>=24.0.0`. | `/tmp/cowork-os-inspect/package.json` |
-| CoWork OS product scope | README lists local AI super app, GUI-first/CLI-capable agent operations, first-class CLI, long-running runtime, Everything Workbench, developer workbench, inbox/channels, automation/memory loop, and local-first security. | `/tmp/cowork-os-inspect/README.md` |
-| CoWork OS repo landmarks | Architecture docs identify `src/electron`, `src/cli`, `src/renderer`, `src/shared`, `docs`, and `.cowork/` as primary landmarks. | `/tmp/cowork-os-inspect/docs/architecture.md` |
-| CoWork OS Mission Control | Mission Control is documented as a "centralized, GUI-first agent orchestration and monitoring dashboard." | `/tmp/cowork-os-inspect/docs/mission-control.md` |
+| CoWork OS repo | `cowork-os/cowork-os` describes itself as a "GUI-first, CLI-capable local AI super app and everything app for getting real work done." | [GitHub](https://github.com/cowork-os/cowork-os) and `/tmp/cowork-os-compare/README.md` |
+| CoWork OS current HEAD | `cowork-os/cowork-os` HEAD inspected at `4ee256df011dbff0072f76fe93d7b17204e9f80c`. | `git ls-remote https://github.com/cowork-os/cowork-os.git HEAD` on 2026-06-23 |
+| CoWork OS package | `package.json` name is `cowork-os`, version `0.5.49`, license `MIT`, Node engine `>=24.0.0`. | `/tmp/cowork-os-compare/package.json` |
+| CoWork OS product scope | README lists local AI super app, GUI-first/CLI-capable agent operations, first-class CLI, long-running runtime, Everything Workbench, developer workbench, inbox/channels, automation/memory loop, and local-first security. | `/tmp/cowork-os-compare/README.md` |
+| CoWork OS repo shape | Source includes broad OS modules such as `src/electron/agent`, `mission-control`, `knowledge-graph`, `cron`, `browser`, `mailbox`, `terminal`, `tunnels`, `memory`, `automation`, and `src/cli`. | `/tmp/cowork-os-compare/src` |
+| CoWork OS Mission Control | Mission Control is documented as a "centralized, GUI-first agent orchestration and monitoring dashboard." | `/tmp/cowork-os-compare/docs/mission-control.md` |
+| CoWork OS LLM Wiki | The `llm-wiki` vault creates `research/wiki/` with raw captures, durable notes, maps, entities, comparisons, queries, outputs, and analyzer reports. | `/tmp/cowork-os-compare/docs/llm-wiki.md` |
+| CoWork OS CLI | Local `cowork` CLI shares desktop profile, database, provider settings, workspaces, skills, and MCP config; remote Control Plane mode is explicit through `--remote`. | `/tmp/cowork-os-compare/docs/cli.md` |
 
 ## Inference
 
@@ -76,6 +79,40 @@ drop for this fork are broad "everything app" scope, email/docs/spreadsheets
 as first-class surfaces, multi-channel consumer messaging, and a local agent
 daemon that competes with Anna. Anna already owns the heavy agent runtime.
 This client should expose Anna safely and beautifully.
+
+### CoWork OS Comparison Update
+
+`cowork-os/cowork-os` should stay a reference product, not the implementation
+base for EveOS Beauty.
+
+| Dimension | CoWork OS | EveOS Beauty decision |
+|---|---|---|
+| Product goal | General local AI super app for coding, knowledge work, artifacts, channels, automation, memory, and agent orchestration. | Narrow team client for Anna Beauty OS decisions, Beauty KB evidence, and analyst queue visibility. |
+| Runtime ownership | Owns a broad local runtime: desktop, CLI, daemon, providers, memory, KG, tools, channels, cron, and Mission Control. | Anna/OpenClaw owns heavy execution. The client should call the Beauty API and show queue/evidence state. |
+| Best reusable pattern | Mission Control global queue truth, task timelines, artifact workbench, LLM Wiki vault model, CLI/control-plane split. | Reinterpret as Beauty queue monitor, decision packet workbench, Beauty wiki browser, and future `eveos-beauty` CLI. |
+| What to avoid | Migrating mail, docs, sheets, decks, WhatsApp/Discord, local agent daemon, provider marketplace, or every connector into the MVP. | Keep these out unless a direct Beauty OS workflow demands them. |
+| Security posture | Local-first, BYOK, local CLI sharing desktop config, optional remote Control Plane. | Team-safe remote gateway: Cloudflare Access plus Beauty token, no Anna SSH/Tailscale/DB exposure. |
+| Memory pattern | Workspace-local LLM Wiki plus Knowledge Graph and memory loops. | Anna canonical DB/GBrain remains source of truth; client can browse/surface compressed wiki and evidence packets. |
+
+Immediate borrow list:
+
+- Mission Control semantics: show running/waiting/failed/stale honestly, and do
+  not hide global queue discrepancy.
+- Artifact workbench pattern: saved Decision packets should open as first-class
+  reviewable artifacts with citations and exports.
+- LLM Wiki pattern: add a Beauty wiki browser over Anna's distilled markdown
+  instead of asking users to open files.
+- CLI split: later add a tiny `eveos-beauty` CLI for health, queue, and packet
+  export; keep remote execution explicit and token-gated.
+
+Non-goals:
+
+- Rebuilding CoWork OS inside EveOS Beauty.
+- Moving Anna cron/crawling/KB ownership into the desktop client.
+- Adding broad office-document creation before the Beauty decision loop is
+  reliable.
+- Adding a second local memory/KG that competes with Anna's canonical Beauty
+  KB/GBrain.
 
 ## Target Users
 
@@ -451,6 +488,8 @@ npm install
 npm run typecheck
 npm test -- --run
 npm run lint
+npm run smoke:electron
+npm run smoke:package-app
 npm run dev
 ```
 

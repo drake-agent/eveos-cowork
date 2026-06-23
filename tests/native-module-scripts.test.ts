@@ -40,6 +40,11 @@ describe('native module scripts', () => {
     expect(pkg.scripts['smoke:electron']).toBe(
       'npm run rebuild:electron && vite build && electron . --smoke-test'
     );
+    expect(pkg.scripts['smoke:package-app']).toBe('node scripts/smoke-packaged-app.mjs');
+    expect(pkg.scripts['smoke:package-real']).toBe(
+      'npm run build && npm run smoke:package-app && npm run smoke:beauty-api'
+    );
+    expect(fs.existsSync(path.join(root, 'scripts/smoke-packaged-app.mjs'))).toBe(true);
   });
 
   it('keeps Electron smoke mode from continuing into normal app startup', () => {
