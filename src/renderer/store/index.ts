@@ -85,6 +85,7 @@ interface AppState {
   sidebarCollapsed: boolean;
   contextPanelCollapsed: boolean;
   showSettings: boolean;
+  showBeautyDesk: boolean;
   settingsTab: string | null;
 
   // Permission
@@ -153,6 +154,7 @@ interface AppState {
   setSidebarCollapsed: (collapsed: boolean) => void;
   setContextPanelCollapsed: (collapsed: boolean) => void;
   setShowSettings: (show: boolean) => void;
+  setShowBeautyDesk: (show: boolean) => void;
   setSettingsTab: (tab: string | null) => void;
 
   setPendingPermission: (permission: PermissionRequest | null) => void;
@@ -226,6 +228,7 @@ export const useAppStore = create<AppState>((set) => ({
   sidebarCollapsed: false,
   contextPanelCollapsed: false,
   showSettings: false,
+  showBeautyDesk: true,
   settingsTab: null,
   pendingPermission: null,
   pendingSudoPassword: null,
@@ -541,6 +544,7 @@ export const useAppStore = create<AppState>((set) => ({
   setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
   setContextPanelCollapsed: (collapsed) => set({ contextPanelCollapsed: collapsed }),
   setShowSettings: (show) => set({ showSettings: show }),
+  setShowBeautyDesk: (show) => set({ showBeautyDesk: show }),
   setSettingsTab: (tab) => set({ settingsTab: tab }),
 
   // Permission actions

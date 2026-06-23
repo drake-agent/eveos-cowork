@@ -4,7 +4,7 @@
  * AI query execution engine (1514 lines).
  *
  * Responsibilities:
- * - Runs AI conversations via the Open Cowork agent SDK (createAgentSession)
+ * - Runs AI conversations via the EveOS Beauty agent SDK (createAgentSession)
  * - Routes providers via pi-ai SDK for model resolution
  * - Bridges MCP tools into SDK ToolDefinition format
  * - Streams responses back as ServerEvents (stream.message, stream.partial, trace.step)
@@ -898,7 +898,7 @@ ${hints.join('\n')}
     this._skillsAdapter = skillsAdapter;
     this.extensionManager = extensionManager;
 
-    log('[ClaudeAgentRunner] Initialized with Open Cowork agent SDK');
+    log('[ClaudeAgentRunner] Initialized with EveOS Beauty agent SDK');
     log('[ClaudeAgentRunner] Skills enabled: settingSources=[user, project], Skill tool enabled');
     if (mcpManager) {
       log('[ClaudeAgentRunner] MCP support enabled');
@@ -2099,7 +2099,7 @@ This is an isolated sandbox environment. Use ${VIRTUAL_WORKSPACE_PATH} as the ro
             : '';
 
       const coworkAppendPrompt = [
-        'You are an Open Cowork assistant. Be concise, accurate, and tool-capable.',
+        'You are an EveOS Beauty assistant. Be concise, accurate, and tool-capable.',
         `CRITICAL BEHAVIORAL RULES:
 1. CHAT FIRST: By default, respond to the user in plain text within the conversation. Do NOT create, write, or edit files unless the user explicitly asks you to (e.g., "create a file", "write this to...", "edit the code", "save as...", mentions a specific file path, or describes code changes they want applied). For questions, summaries, explanations, analysis, and general conversation — always reply directly in chat text.
 2. When a request is actionable, proceed immediately with reasonable assumptions. If you need clarification, ask briefly in plain text.

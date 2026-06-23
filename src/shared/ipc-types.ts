@@ -61,6 +61,69 @@ export type McpPresetsMap = Record<
 >;
 
 // ---------------------------------------------------------------------------
+// Beauty OS
+// ---------------------------------------------------------------------------
+
+export interface BeautyPublicConfig {
+  baseUrl: string;
+  hasToken: boolean;
+  updatedAt: string;
+}
+
+export interface BeautyConfigInput {
+  baseUrl?: string;
+  token?: string;
+}
+
+export interface BeautyQuestionRequest {
+  question: string;
+  market?: string;
+  brand?: string;
+  product?: string;
+  decision_type?: string;
+}
+
+export interface BeautyAnalystRunRequest extends BeautyQuestionRequest {
+  wait?: boolean;
+}
+
+export interface BeautyDecisionPacketInput {
+  id?: string;
+  question: string;
+  market?: string;
+  brand?: string;
+  product?: string;
+  decision_type?: string;
+  run_id?: string;
+  brief?: unknown;
+  answer: unknown;
+}
+
+export interface BeautyDecisionPacket extends BeautyDecisionPacketInput {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BeautyPacketListFilters {
+  market?: string;
+  brand?: string;
+  product?: string;
+  limit?: number;
+}
+
+export interface BeautyPacketExportInput {
+  id: string;
+  targetPath?: string;
+}
+
+export interface BeautyPacketExportResult {
+  success: boolean;
+  path?: string;
+  error?: string;
+}
+
+// ---------------------------------------------------------------------------
 // Remote
 // ---------------------------------------------------------------------------
 

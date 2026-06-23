@@ -14,6 +14,7 @@ import {
   Plus,
   ListChecks,
   Check,
+  Layers,
 } from 'lucide-react';
 import type { Session } from '../types';
 
@@ -34,6 +35,7 @@ export function Sidebar() {
   const setMessages = useAppStore((s) => s.setMessages);
   const setTraceSteps = useAppStore((s) => s.setTraceSteps);
   const updateSettings = useAppStore((s) => s.updateSettings);
+  const setShowBeautyDesk = useAppStore((s) => s.setShowBeautyDesk);
   const isConfigured = useAppStore((s) => s.isConfigured);
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useAppStore((s) => s.toggleSidebar);
@@ -149,6 +151,7 @@ export function Sidebar() {
   const handleSessionClick = useCallback(
     async (sessionId: string) => {
       setShowSettings(false);
+      setShowBeautyDesk(false);
 
       if (activeSessionId === sessionId) return;
 
@@ -191,6 +194,7 @@ export function Sidebar() {
       isElectron,
       setActiveSession,
       setMessages,
+      setShowBeautyDesk,
       setShowSettings,
       setTraceSteps,
     ]
@@ -199,6 +203,13 @@ export function Sidebar() {
   const handleNewSession = () => {
     setActiveSession(null);
     setShowSettings(false);
+    setShowBeautyDesk(false);
+  };
+
+  const handleOpenBeautyDesk = () => {
+    setActiveSession(null);
+    setShowSettings(false);
+    setShowBeautyDesk(true);
   };
 
   const handleDeleteSession = (e: React.MouseEvent, sessionId: string) => {
@@ -238,6 +249,13 @@ export function Sidebar() {
             title={t('sidebar.newTask')}
           >
             <Plus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleOpenBeautyDesk}
+            className="w-9 h-9 rounded-2xl flex items-center justify-center bg-accent-muted text-accent hover:bg-surface-hover transition-colors"
+            title="Beauty OS"
+          >
+            <Layers className="w-4 h-4" />
           </button>
         </div>
 
@@ -286,7 +304,7 @@ export function Sidebar() {
             />
             <div className="min-w-0">
               <h1 className="text-[1.34rem] leading-none font-semibold tracking-[-0.035em] text-text-primary">
-                Open Cowork
+                EveOS Beauty
               </h1>
             </div>
           </div>
@@ -305,6 +323,14 @@ export function Sidebar() {
         >
           <Plus className="w-4 h-4 text-text-secondary flex-shrink-0" />
           <span className="text-[13px] font-medium">{t('sidebar.newTask')}</span>
+        </button>
+
+        <button
+          onClick={handleOpenBeautyDesk}
+          className="mt-2 w-full flex items-center gap-2 rounded-xl border border-accent/20 bg-accent-muted/40 px-3 py-2 text-left text-text-primary hover:bg-accent-muted transition-colors"
+        >
+          <Layers className="w-4 h-4 text-accent flex-shrink-0" />
+          <span className="text-[13px] font-medium">Beauty OS</span>
         </button>
 
         {sessions.length > 0 && (
